@@ -1,27 +1,15 @@
-// const express = require('express');
-// const app = express();
-// const port = 8000;
-
-// app.get('/test', (req, res) => {
-// res.send('Test Successful.');
-// });
-
-// app.listen(port, () => {
-// console.log(`Example app is listening on port ${port}.`);
-// });
-
-const { Pool } = require('pg');
+const express = require('express');
+const app = express();
 require('dotenv').config();
+const authRoutes = require('./routes/authRoutes');
 
-const pool = new Pool({
-    connectionString: process.env.DB_URL,
+
+app.use(express.json());
+app.use('/apiv1/auth', authRoutes);
+
+app.get('/test', (req, res) => {
+res.send('Test Successful.');
 });
 
-pool.connect()
-    .then(() => {
-        console.log('PostgreSQL connected successfully!');
-        return pool.end(); // Close connection after check
-    })
-    .catch((err) => {
-        console.error(' PostgreSQL connection failed:', err.message);
-    });
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
