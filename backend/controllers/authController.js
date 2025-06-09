@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { findUserByPhone } = require('../models/userModel');
+const { findUserByPhone,createUser, getUserByEmailOrPhone } = require('../models/userModel');
 
 require('dotenv').config();
 
@@ -37,4 +37,36 @@ const loginUser = async (req, res) => {
   }
 };
 
-module.exports = { loginUser };
+const signup = async (req, res) => {
+  try {
+    const { name, email, phone, license_no, password, role } = req.body;
+
+    if (!name || !email || !license_no || !password) {
+      return res.status(400).json({ error: 'Required fields missing' });
+    }
+
+    // Check if user already exists
+    const existingUser = await getUserByEmailOrPhone(email, phone);
+    if (existingUser) {
+      return res.status(409).json({ error: 'Email or phone already registered' });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = await createUser({
+      name,
+      email,
+      phone,
+      license_no,
+      password: hashedPassword,
+      role,
+    });
+
+    res.status(201).json({ message: 'User created successfully', user: newUser });
+  } catch (err) {
+    console.error('Signup error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+module.exports = { loginUser, signup };

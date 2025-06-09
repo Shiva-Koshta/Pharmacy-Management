@@ -5,6 +5,7 @@ const authRoutes = require('./routes/authRoutes');
 
 
 app.use(express.json());
+
 app.use('/apiv1/auth', authRoutes);
 
 app.get('/test', (req, res) => {
