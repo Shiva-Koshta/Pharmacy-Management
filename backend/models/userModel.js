@@ -17,8 +17,9 @@ const createUser = async ({ name, email, phone, license_no, password, role }) =>
 };
 
 const getUserByEmailOrPhone = async (email, phone) => {
+  const query = `SELECT * FROM users WHERE email = $1 OR phone = $2`;
   const { rows } = await pool.query(
-    `SELECT * FROM users WHERE email = $1 OR phone = $2`,
+    query,
     [email, phone]
   );
   return rows[0];
