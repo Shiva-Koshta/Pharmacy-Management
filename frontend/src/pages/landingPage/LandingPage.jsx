@@ -7,7 +7,7 @@ import Footer from "./Footer";
 
 export default function LandingPage() {
     return (
-        <div className="bg-gray-900 text-cyan-200">
+        <div className="bg-gradient-to-r from-gray-700 via-gray-800 to-gray-900 text-cyan-200">
             <HeroSection />
             <FeaturesSection />
             <HowItWorksSection />

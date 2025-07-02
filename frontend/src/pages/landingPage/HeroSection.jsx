@@ -5,9 +5,10 @@ export default function HeroSection() {
 
     return (
         <section className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white py-16 px-4 text-center">
-            <h1 className="text-4xl md:text-5xl font-extrabold text-indigo-400 mb-4">
-                Pharmacy Store Management System
+            <h1 className="text-5xl md:text-7xl font-poppins font-extrabold mb-4 bg-gradient-to-r from-indigo-400 via-purple-500 to-pink-400 text-transparent bg-clip-text">
+                Mediverse
             </h1>
+
             <p className="text-lg md:text-xl text-sky-200 mb-8">
                 Track inventory, manage purchases, and never miss an expiry again.
             </p>

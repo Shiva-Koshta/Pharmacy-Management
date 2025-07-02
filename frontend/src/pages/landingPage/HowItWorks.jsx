@@ -25,11 +25,11 @@ const steps = [
 export default function HowItWorksSection() {
     return (
         <section class="py-16 bg-gradient-to-r from-slate-700 to-gray-900  text-center ">
-            <h2 class="text-3xl font-semibold text-gray-80 mb-10">How It Works</h2>
+            <h2 class="text-3xl md-4xl font-semibold text-gray-80 mb-10">How It Works</h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 px-4 md:px-20">
                 <div class="bg-white p-6 rounded-xl border shadow-sm hover:shadow-md transition">
                     <div class="w-10 h-10 mx-auto bg-blue-600 text-white font-bold rounded-full flex items-center justify-center mb-3">1</div>
-                    <h3 class="text-lg font-semibold text-gray-800">Add Medicines</h3>
+                    <h3 class="text-xl md:text-2xl font-semibold text-gray-800">Add Medicines</h3>
                     <p class="text-sm text-gray-500 mt-2">Input medicine details including quantity and expiry.</p>
                 </div>
                 <div class="bg-white p-6 rounded-xl border shadow-sm hover:shadow-md transition">

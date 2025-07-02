@@ -4,7 +4,7 @@ import LoginForm from "../../components/LoginForm";
 import SignupForm from "../../components/SignupForm";
 import loginImg from "../../assets/login-img.jpg";
 import signupImg from "../../assets/signup-img.jpg";
-
+import bgImg from "../../assets/Pharmacy-auth-Background.png"
 const AuthContainer = () => {
     const location = useLocation();
     const navigate = useNavigate();
@@ -29,7 +29,7 @@ const AuthContainer = () => {
                 className="absolute inset-0 bg-cover bg-center filter blur-sm"
                 style={{
                     backgroundImage:
-                        "url(https://png.pngtree.com/thumb_back/fh260/background/20230717/pngtree-the-connection-between-our-planet-and-our-well-being-a-3d-image_3894914.jpg)",
+                        `url(${bgImg})`,
                 }}
             />
 
