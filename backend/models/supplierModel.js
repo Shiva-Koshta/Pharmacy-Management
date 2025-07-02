@@ -24,12 +24,12 @@ class Supplier {
 
     // Validate supplier data
     isValid() {
-        return this.name && 
-               this.name.length <= 100 &&
-               (!this.contact_person || this.contact_person.length <= 100) &&
-               (!this.phone || this.phone.length <= 15) &&
-               (!this.email || this.isValidEmail(this.email)) &&
-               (!this.email || this.email.length <= 100);
+        return this.name &&
+            this.name.length <= 100 &&
+            (!this.contact_person || this.contact_person.length <= 100) &&
+            (!this.phone || this.phone.length <= 15) &&
+            (!this.email || this.isValidEmail(this.email)) &&
+            (!this.email || this.email.length <= 100);
     }
 
     // Validate email format
@@ -72,7 +72,7 @@ const getAllSuppliers = async () => {
 const getSupplierById = async (supplier_id) => {
     const query = 'SELECT * FROM suppliers WHERE supplier_id = $1';
     const { rows } = await pool.query(query, [supplier_id]);
-    
+
     if (rows.length === 0) {
         throw new Error(`Supplier with ID ${supplier_id} not found`);
     }
@@ -114,7 +114,7 @@ const updateSupplier = async (supplier_id, supplier) => {
         supplier_id
     ];
     const { rows } = await pool.query(query, values);
-    
+
     if (rows.length === 0) {
         throw new Error(`Supplier with ID ${supplier_id} not found`);
     }
@@ -124,7 +124,7 @@ const updateSupplier = async (supplier_id, supplier) => {
 const deleteSupplier = async (supplier_id) => {
     const query = 'DELETE FROM suppliers WHERE supplier_id = $1 RETURNING *';
     const { rows } = await pool.query(query, [supplier_id]);
-    
+
     if (rows.length === 0) {
         throw new Error(`Supplier with ID ${supplier_id} not found`);
     }

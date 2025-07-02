@@ -1,15 +1,30 @@
-import React, { useState } from "react";
-import LoginForm from "./LoginForm";
-import SignupForm from "./SignupForm";
-import loginImg from "../assets/login-img.jpg";
-import signupImg from "../assets/signup-img.jpg";
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import LoginForm from "../../components/LoginForm";
+import SignupForm from "../../components/SignupForm";
+import loginImg from "../../assets/login-img.jpg";
+import signupImg from "../../assets/signup-img.jpg";
 
 const AuthContainer = () => {
+    const location = useLocation();
+    const navigate = useNavigate();
     const [isSignUp, setIsSignUp] = useState(false);
 
+    // Detect current route
+    useEffect(() => {
+        if (location.pathname === "/signup") {
+            setIsSignUp(true);
+        } else {
+            setIsSignUp(false); // default to login
+        }
+    }, [location.pathname]);
+
     return (
-        <section id="reg_login" className="relative min-h-screen flex justify-center items-center overflow-hidden">
-            {/* Blurred Background Image */}
+        <section
+            id="reg_login"
+            className="relative min-h-screen flex justify-center items-center overflow-hidden"
+        >
+            {/* Background */}
             <div
                 className="absolute inset-0 bg-cover bg-center filter blur-sm"
                 style={{
@@ -18,9 +33,18 @@ const AuthContainer = () => {
                 }}
             />
 
-            {/* Main Content */}
+            {/* ❌ Close Button */}
+            <button
+                onClick={() => navigate(-1)} // go back
+                className="absolute top-6 right-6 z-20 bg-white text-gray-700 border border-gray-300 rounded-full p-2 hover:bg-gray-100 transition"
+                title="Close"
+            >
+                ❌
+            </button>
+
+            {/* Container */}
             <div className="relative w-[800px] h-[500px] bg-white/70 shadow-2xl overflow-hidden flex rounded-2xl z-10">
-                {/* Sign In Section */}
+                {/* Login Section */}
                 <div
                     className={`absolute inset-0 flex transition-transform duration-500 ${isSignUp ? "-translate-x-full" : ""
                         }`}
@@ -37,7 +61,7 @@ const AuthContainer = () => {
                     </div>
                 </div>
 
-                {/* Sign Up Section */}
+                {/* Signup Section */}
                 <div
                     className={`absolute inset-0 flex transition-transform duration-500 ${isSignUp ? "" : "translate-x-full"
                         }`}
