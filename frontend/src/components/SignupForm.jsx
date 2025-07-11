@@ -1,29 +1,65 @@
 import React, { useState } from "react";
+import { toast } from "react-toastify";
 
 const SignupForm = ({ onToggle }) => {
     const [formData, setFormData] = useState({
         username: "",
         email: "",
+        phone: "",
+        license: "",
+        gst: "",
         password: "",
         confirmPassword: "",
-        license: "",
-        gst: ""
     });
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        setFormData((prev) => ({
+            ...prev,
+            [e.target.name]: e.target.value,
+        }));
     };
 
-    const handleSignupSubmit = (e) => {
+    const handleSignupSubmit = async (e) => {
         e.preventDefault();
 
         if (formData.password !== formData.confirmPassword) {
-            alert("Passwords do not match!");
+            toast.error("Passwords do not match!");
             return;
         }
 
-        alert("Account created successfully!");
-        setTimeout(() => onToggle(), 1000);
+        try {
+            const res = await fetch("http://localhost:5000/apiv1/auth/signup", {
+                method: "POST",
+                credentials: "include", // 🔐 allow cookies
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    name: formData.username,
+                    email: formData.email,
+                    phone: formData.phone,
+                    license_no: formData.license,
+                    gst_no: formData.gst || undefined,
+                    password: formData.password,
+                    role: "pharmacist", // or set based on user choice
+                }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                toast.error(data.error || "Signup failed");
+                return;
+            }
+
+            toast.success("Account created successfully!");
+            // setTimeout(() => onToggle(), 1000); // switch to login
+            setTimeout(() => navigate("/dashboard"), 1000);
+
+        } catch (error) {
+            console.error("Signup error:", error);
+            toast.error("Server error. Please try again.");
+        }
     };
 
     return (
@@ -36,27 +72,36 @@ const SignupForm = ({ onToggle }) => {
                 type="text"
                 name="username"
                 placeholder="Username"
-                required
                 value={formData.username}
                 onChange={handleChange}
+                required
                 className="mb-3 p-2 bg-gray-100"
             />
             <input
                 type="email"
                 name="email"
                 placeholder="Email"
-                required
                 value={formData.email}
                 onChange={handleChange}
+                required
+                className="mb-3 p-2 bg-gray-100"
+            />
+            <input
+                type="text"
+                name="phone"
+                placeholder="Phone Number"
+                value={formData.phone}
+                onChange={handleChange}
+                required
                 className="mb-3 p-2 bg-gray-100"
             />
             <input
                 type="text"
                 name="license"
                 placeholder="License Number"
-                required
                 value={formData.license}
                 onChange={handleChange}
+                required
                 className="mb-3 p-2 bg-gray-100"
             />
             <input
@@ -71,18 +116,18 @@ const SignupForm = ({ onToggle }) => {
                 type="password"
                 name="password"
                 placeholder="Create Password"
-                required
                 value={formData.password}
                 onChange={handleChange}
+                required
                 className="mb-3 p-2 bg-gray-100"
             />
             <input
                 type="password"
                 name="confirmPassword"
                 placeholder="Confirm Password"
-                required
                 value={formData.confirmPassword}
                 onChange={handleChange}
+                required
                 className="mb-3 p-2 bg-gray-100"
             />
 
