@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { findUserByPhone,createUser, getUserByEmailOrPhone } = require('../models/userModel');
+const { findUserByPhone,createUser, getUserByEmailOrPhone, getUserById } = require('../models/userModel');
 
 require('dotenv').config();
 
@@ -101,4 +101,26 @@ const signup = async (req, res) => {
   }
 };
 
-module.exports = { loginUser, signup };
+const verifyToken = async (req, res) => {
+  const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
+
+  if (!token) return res.status(401).json({ verified: false, error: 'No token provided' });
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await getUserById(decoded.id); // 👈 id stored in JWT
+
+    if (!user) {
+      return res.status(404).json({ verified: false, error: 'User not found' });
+    }
+
+    return res.status(200).json({
+      verified: true,
+      user,
+    });
+  } catch (err) {
+    return res.status(403).json({ verified: false, error: 'Invalid or expired token' });
+  }
+};
+
+module.exports = { loginUser, signup, verifyToken };
