@@ -5,6 +5,7 @@ const authRoutes = require('./routes/authRoutes');
 const medicineRoutes = require('./routes/medicineRoutes');
 const supplierRoutes = require('./routes/supplierRoutes');
 const customerRoutes = require('./routes/customerRoutes');
+const purchaseRoutes = require('./routes/purchaseRoutes');
 const authenticateJWT = require('./middleware/jwtAuth');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
@@ -21,6 +22,7 @@ app.use('/apiv1/auth', authRoutes);
 app.use('/apiv1/medicine', authenticateJWT, medicineRoutes);
 app.use('/apiv1/suppliers',authenticateJWT, supplierRoutes);
 app.use('/apiv1/customers',authenticateJWT, customerRoutes);
+app.use('/apiv1/purchase', authenticateJWT, purchaseRoutes);
 
 app.get('/test', (req, res) => {
 res.send('Test Successful.');

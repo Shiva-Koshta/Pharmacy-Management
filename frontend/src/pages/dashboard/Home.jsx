@@ -18,7 +18,9 @@ export default function HomePage() {
 
     const fetchMedicineStats = async () => {
         try {
-            const res = await axios.get("http://localhost:3000/api/medicines");
+            const res = await axios.get("http://localhost:5000/apiv1/medicine", {
+                withCredentials: true
+            });
             const meds = res.data.data || [];
 
             const now = new Date();

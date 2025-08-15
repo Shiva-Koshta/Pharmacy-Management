@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "../contexts/UserContext";
 
 const LoginForm = ({ onToggle }) => {
     const navigate = useNavigate();
+    const { login } = useUser();
 
     const [phone, setPhone] = useState("");
     const [password, setPassword] = useState("");
@@ -14,25 +16,14 @@ const LoginForm = ({ onToggle }) => {
         setLoading(true);
 
         try {
-            const res = await fetch("http://localhost:5000/apiv1/auth/login", {
-                method: "POST",
-                credentials: "include", // 🔐 this allows cookies
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ phone, password }),
-            });
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                toast.error(data.message || "Login failed");
-                setLoading(false);
-                return;
+            const result = await login(phone, password);
+            
+            if (result.success) {
+                toast.success(result.message);
+                setTimeout(() => navigate("/dashboard"), 1000);
+            } else {
+                toast.error(result.message);
             }
-
-            toast.success("Login successful!");
-            setTimeout(() => navigate("/dashboard"), 1000);
         } catch (err) {
             console.error("Login error:", err);
             toast.error("Server error");

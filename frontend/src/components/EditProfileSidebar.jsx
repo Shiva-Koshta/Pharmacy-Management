@@ -1,20 +1,58 @@
 // src/components/EditProfileSidebar.jsx
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-
+import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import { X, LogOut, Save } from "lucide-react";
+import { useUser } from "../contexts/UserContext";
 
 export default function EditProfileSidebar({ isOpen, onClose }) {
-    const [name, setName] = useState("John Doe");
-    const [email, setEmail] = useState("johndoe@example.com");
-    const phone = "9876543210"; // read-only
-    const navigate = useNavigate();
+    const { user, logout, updateProfile } = useUser();
+    
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    const handleLogout = () => {
-        // TODO: Clear tokens from localStorage/sessionStorage if used
-        console.log("Logged out");
-        onClose();               // Close the sidebar
-        navigate("/");           // Redirect to landing page
+    // Update form fields when user data changes
+    useEffect(() => {
+        if (user) {
+            setName(user.name || "");
+            setEmail(user.email || "");
+        }
+    }, [user]);
+
+    const handleSaveChanges = async () => {
+        if (!name.trim() || !email.trim()) {
+            toast.error("Name and email are required");
+            return;
+        }
+
+        setLoading(true);
+        
+        try {
+            const result = await updateProfile({ name, email });
+            
+            if (result.success) {
+                toast.success(result.message);
+                onClose();
+            } else {
+                toast.error(result.message);
+            }
+        } catch (error) {
+            console.error("Update profile error:", error);
+            toast.error("Failed to update profile");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleLogout = async () => {
+        try {
+            await logout();
+            toast.success("Logged out successfully");
+            onClose();
+        } catch (error) {
+            console.error("Logout error:", error);
+            toast.error("Logout failed");
+        }
     };
 
     return (
@@ -56,17 +94,18 @@ export default function EditProfileSidebar({ isOpen, onClose }) {
                     <label className="block text-sm text-gray-600">Phone</label>
                     <input
                         type="text"
-                        value={phone}
+                        value={user?.phone || ""}
                         readOnly
                         className="w-full border px-3 py-2 rounded mt-1 bg-gray-100 cursor-not-allowed"
                     />
                 </div>
 
                 <button
-                    onClick={() => alert("Changes Saved")}
-                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow w-full"
+                    onClick={handleSaveChanges}
+                    disabled={loading}
+                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow w-full disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                    <Save size={18} /> Save Changes
+                    <Save size={18} /> {loading ? "Saving..." : "Save Changes"}
                 </button>
 
                 <hr className="my-4" />

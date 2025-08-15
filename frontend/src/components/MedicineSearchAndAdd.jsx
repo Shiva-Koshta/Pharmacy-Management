@@ -12,7 +12,9 @@ export default function MedicineSearchAndAdd({ onAdd }) {
 
     const fetchMedicines = async () => {
         try {
-            const res = await axios.get("http://localhost:3000/api/medicines");
+            const res = await axios.get("http://localhost:5000/apiv1/medicine", {
+                withCredentials: true
+            });
             setMedicines(res.data.data);
         } catch (err) {
             console.error("Error fetching medicines", err);

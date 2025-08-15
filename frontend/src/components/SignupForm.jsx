@@ -1,7 +1,12 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import { useUser } from "../contexts/UserContext";
 
 const SignupForm = ({ onToggle }) => {
+    const navigate = useNavigate();
+    const { signup } = useUser();
+    
     const [formData, setFormData] = useState({
         username: "",
         email: "",
@@ -11,6 +16,7 @@ const SignupForm = ({ onToggle }) => {
         password: "",
         confirmPassword: "",
     });
+    const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
         setFormData((prev) => ({
@@ -27,38 +33,30 @@ const SignupForm = ({ onToggle }) => {
             return;
         }
 
+        setLoading(true);
+
         try {
-            const res = await fetch("http://localhost:5000/apiv1/auth/signup", {
-                method: "POST",
-                credentials: "include", // 🔐 allow cookies
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    name: formData.username,
-                    email: formData.email,
-                    phone: formData.phone,
-                    license_no: formData.license,
-                    gst_no: formData.gst || undefined,
-                    password: formData.password,
-                    role: "pharmacist", // or set based on user choice
-                }),
+            const result = await signup({
+                name: formData.username,
+                email: formData.email,
+                phone: formData.phone,
+                license_no: formData.license,
+                gst_no: formData.gst || undefined,
+                password: formData.password,
+                role: "pharmacist",
             });
 
-            const data = await res.json();
-
-            if (!res.ok) {
-                toast.error(data.error || "Signup failed");
-                return;
+            if (result.success) {
+                toast.success(result.message);
+                setTimeout(() => navigate("/dashboard"), 1000);
+            } else {
+                toast.error(result.message);
             }
-
-            toast.success("Account created successfully!");
-            // setTimeout(() => onToggle(), 1000); // switch to login
-            setTimeout(() => navigate("/dashboard"), 1000);
-
         } catch (error) {
             console.error("Signup error:", error);
             toast.error("Server error. Please try again.");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -133,9 +131,10 @@ const SignupForm = ({ onToggle }) => {
 
             <button
                 type="submit"
-                className="bg-purple-700 text-white py-2 font-medium hover:bg-purple-900 transition"
+                disabled={loading}
+                className="bg-purple-700 text-white py-2 font-medium hover:bg-purple-900 transition disabled:opacity-60 disabled:cursor-not-allowed"
             >
-                Sign Up
+                {loading ? "Creating Account..." : "Sign Up"}
             </button>
 
             <p className="mt-4 text-xs text-gray-600 text-center">

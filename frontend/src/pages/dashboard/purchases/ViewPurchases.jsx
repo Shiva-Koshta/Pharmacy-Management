@@ -21,7 +21,9 @@ export default function ViewPurchases() {
 
     const fetchPurchases = async () => {
         try {
-            const res = await axios.get("http://localhost:3000/api/purchases");
+            const res = await axios.get("http://localhost:5000/apiv1/purchase", {
+                withCredentials: true
+            });
             setPurchases(res.data.data || []);
         } catch (err) {
             console.error("Failed to fetch purchases:", err);
