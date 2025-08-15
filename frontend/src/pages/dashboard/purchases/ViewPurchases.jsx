@@ -6,94 +6,150 @@ import PurchaseCard from "../../../components/PurchaseCard";
 
 export default function ViewPurchases() {
     const [purchases, setPurchases] = useState([]);
-    const [filtered, setFiltered] = useState([]);
-    const [startDate, setStartDate] = useState("");
-    const [endDate, setEndDate] = useState("");
-    const [supplier, setSupplier] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [filters, setFilters] = useState({
+        start_date: "",
+        end_date: "",
+        supplier_name: "",
+        medicine_name: "",
+        invoice_number: ""
+    });
 
     useEffect(() => {
         fetchPurchases();
-    }, []);
-
-    useEffect(() => {
-        applyFilters();
-    }, [startDate, endDate, supplier, purchases]);
+    }, [filters]);
 
     const fetchPurchases = async () => {
         try {
-            const res = await axios.get("http://localhost:5000/apiv1/purchase", {
+            setLoading(true);
+            
+            // Build query parameters
+            const params = new URLSearchParams();
+            Object.keys(filters).forEach(key => {
+                if (filters[key]) {
+                    params.append(key, filters[key]);
+                }
+            });
+            
+            const res = await axios.get(`http://localhost:5000/apiv1/purchase?${params.toString()}`, {
                 withCredentials: true
             });
             setPurchases(res.data.data || []);
         } catch (err) {
             console.error("Failed to fetch purchases:", err);
+            setPurchases([]);
+        } finally {
+            setLoading(false);
         }
     };
 
-    const applyFilters = () => {
-        let data = [...purchases];
-
-        if (startDate) {
-            data = data.filter(p => new Date(p.invoice_date) >= new Date(startDate));
-        }
-
-        if (endDate) {
-            data = data.filter(p => new Date(p.invoice_date) <= new Date(endDate));
-        }
-
-        if (supplier.trim()) {
-            data = data.filter(p =>
-                p.supplier_name?.toLowerCase().includes(supplier.toLowerCase())
-            );
-        }
-
-        setFiltered(data);
+    const handleFilterChange = (key, value) => {
+        setFilters(prev => ({
+            ...prev,
+            [key]: value
+        }));
     };
 
     const clearFilters = () => {
-        setStartDate("");
-        setEndDate("");
-        setSupplier("");
+        setFilters({
+            start_date: "",
+            end_date: "",
+            supplier_name: "",
+            medicine_name: "",
+            invoice_number: ""
+        });
     };
 
     return (
         <div className="p-6">
             {/* Filter Controls */}
-            <div className="flex flex-wrap gap-4 mb-6 items-center">
-                <input
-                    type="date"
-                    value={startDate}
-                    onChange={e => setStartDate(e.target.value)}
-                    className="px-4 py-2 border border-gray-300 rounded"
-                />
-                <input
-                    type="date"
-                    value={endDate}
-                    onChange={e => setEndDate(e.target.value)}
-                    className="px-4 py-2 border border-gray-300 rounded"
-                />
-                <input
-                    type="text"
-                    value={supplier}
-                    onChange={e => setSupplier(e.target.value)}
-                    placeholder="🏢 Supplier Name"
-                    className="px-4 py-2 border border-gray-300 rounded w-44"
-                />
-                <button
-                    onClick={clearFilters}
-                    className="px-4 py-2 bg-gray-100 hover:bg-gray-200 border rounded text-sm"
-                >
-                    Clear Filters
-                </button>
+            <div className="bg-gray-50 p-4 rounded-lg mb-6">
+                <h3 className="text-lg font-semibold mb-4">Filter Purchases</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                        <input
+                            type="date"
+                            value={filters.start_date}
+                            onChange={e => handleFilterChange('start_date', e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                        <input
+                            type="date"
+                            value={filters.end_date}
+                            onChange={e => handleFilterChange('end_date', e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Supplier Name</label>
+                        <input
+                            type="text"
+                            value={filters.supplier_name}
+                            onChange={e => handleFilterChange('supplier_name', e.target.value)}
+                            placeholder="Search supplier..."
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Medicine Name</label>
+                        <input
+                            type="text"
+                            value={filters.medicine_name}
+                            onChange={e => handleFilterChange('medicine_name', e.target.value)}
+                            placeholder="Search medicine..."
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Invoice Number</label>
+                        <input
+                            type="text"
+                            value={filters.invoice_number}
+                            onChange={e => handleFilterChange('invoice_number', e.target.value)}
+                            placeholder="Search invoice..."
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                    </div>
+                </div>
+                <div className="mt-4">
+                    <button
+                        onClick={clearFilters}
+                        className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                    >
+                        Clear All Filters
+                    </button>
+                </div>
             </div>
 
             {/* Purchase List */}
-            {filtered.length === 0 ? (
-                <p className="text-gray-500">No purchases found for selected filters.</p>
+            {loading ? (
+                <div className="flex justify-center items-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                    <span className="ml-2 text-gray-600">Loading purchases...</span>
+                </div>
+            ) : purchases.length === 0 ? (
+                <div className="text-center py-8">
+                    <p className="text-gray-500 text-lg">No purchases found for selected filters.</p>
+                    <button
+                        onClick={clearFilters}
+                        className="mt-2 text-blue-600 hover:text-blue-800 underline"
+                    >
+                        Clear filters to see all purchases
+                    </button>
+                </div>
             ) : (
-                filtered.map((purchase, idx) => (
-                    <PurchaseCard key={idx} purchase={purchase} />
-                ))
+                <div className="space-y-3">
+                    <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-lg font-semibold">Purchase Records ({purchases.length})</h3>
+                    </div>
+                    {purchases.map((purchase) => (
+                        <PurchaseCard key={purchase.id} purchase={purchase} />
+                    ))}
+                </div>
             )}
         </div>
     );
